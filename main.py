@@ -1,65 +1,107 @@
-# ======================================
-# 智能代码评审Agent
-# Day2版本
-#
-# 功能：
-# 1. 接收用户代码
-# 2. 调用pylint检查
-# 3. 输出代码问题
-# ======================================
+"""
+智能代码评审Agent入口程序
+
+功能：
+1. 接收用户输入代码
+2. 调用CodeReviewAgent
+3. 生成Markdown报告
+"""
 
 
-# 导入我们的检查模块
-from analyzer.pylint_checker import check_python_code
+# 导入Agent核心类
+from agent.code_review_agent import CodeReviewAgent
+
+
+# 导入报告生成模块
+from agent.report_generator import generate_report
 
 
 
-# 接收用户代码
-def receive_code():
+def get_user_code():
+    """
+    获取用户输入的代码
+
+    用户输入END表示结束
+
+    返回完整代码字符串
+    """
+
 
     print("请输入你的代码")
     print("输入 END 表示结束")
 
 
-    code_lines = []
+    # 保存每一行代码
+
+    lines = []
 
 
     while True:
 
+
+        # 读取一行
+
         line = input()
 
+
+        # 如果输入END，结束
 
         if line == "END":
 
             break
 
 
-        code_lines.append(line)
+        # 保存代码
+
+        lines.append(line)
 
 
-    code = "\n".join(code_lines)
+
+    # 拼接成完整代码
+
+    return "\n".join(lines)
 
 
-    return code
+
+
+def main():
+
+
+    # 获取用户代码
+
+    code = get_user_code()
+
+
+
+    # 创建Agent
+
+    agent = CodeReviewAgent()
+
+
+
+    # 开始评审
+
+    result = agent.review(code)
+
+
+
+    # 生成报告
+
+    report = generate_report(result)
+
+
+
+    print("\n==========评审完成==========")
+
+    print(
+        f"报告位置：{report}"
+    )
+
 
 
 
 # 程序入口
+
 if __name__ == "__main__":
 
-
-    # 获取用户代码
-    user_code = receive_code()
-
-
-    print("\n========== 开始代码检查 ==========\n")
-
-
-    # 调用pylint
-    result = check_python_code(user_code)
-
-
-    print(result)
-
-
-    print("\n========== 检查结束 ==========")
+    main()

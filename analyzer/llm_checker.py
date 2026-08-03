@@ -19,13 +19,26 @@ client = OpenAI(
 
 
 
-def check_by_llm(code):
+def check_by_llm(code, static_result):
 
 
     prompt = f"""
 你是一名资深后端工程师。
 
 请审查下面代码：
+
+
+代码：
+
+{code}
+
+
+静态检查结果：
+
+{static_result}
+
+
+请结合静态检查结果进行分析。
 
 检查：
 1.SQL注入
@@ -34,17 +47,19 @@ def check_by_llm(code):
 4.事务问题
 5.设计问题
 
+请严格按照JSON格式输出：
 
-代码：
-
-{code}
-
-
-输出：
-
-问题位置：
-问题原因：
-修改建议：
+{{
+    "issues":[
+        {{
+            "type":"",
+            "level":"",
+            "location":"",
+            "reason":"",
+            "suggestion":""
+        }}
+    ]
+}}
 """
 
 

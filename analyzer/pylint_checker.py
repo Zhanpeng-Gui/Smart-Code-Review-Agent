@@ -8,6 +8,7 @@
 # 返回检查报告
 # =========================================
 
+import sys
 
 # 文件路径处理
 import os
@@ -41,6 +42,8 @@ def check_python_code(code):
     # 调用pylint
     result = subprocess.run(
         [
+            sys.executable,
+            "-m",
             "pylint",
             file_path
         ],
