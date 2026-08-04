@@ -21,8 +21,12 @@ from analyzer.checkstyle_checker import check_java_code
 from analyzer.llm_checker import check_by_llm
 
 # 导入风险分析模块
-from agent.risk_analyzer import analyze_risk
+from agent.risk_analyzer import (
+    analyze_risk,
+    get_risk_description
+)
 
+from agent.issue_analyzer import analyze_issues
 
 class CodeReviewAgent:
     """
@@ -158,18 +162,30 @@ class CodeReviewAgent:
             ai_result
         )
 
+        risk_description = get_risk_description(
+            risk
+        )
+
+        issue_summary = analyze_issues(
+            ai_result
+        )
+
+        print(
+            f"代码风险等级：{risk}"
+        )
 
         return {
 
             "language": language,
 
-            "risk":
-                risk,
+            "risk": risk,
 
-            "static_check":
-                static_result,
+            "risk_description": risk_description,
 
-            "ai_review":
-                ai_result
+            "issue_summary": issue_summary,
 
-        }
+            "static_check": static_result,
+
+            "ai_review": ai_result
+
+        }  

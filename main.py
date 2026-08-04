@@ -87,7 +87,9 @@ def main():
 
     # 生成报告
 
-    report = generate_report(result)
+    report = generate_report(
+        result
+    )
 
 
 

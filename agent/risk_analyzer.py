@@ -1,92 +1,136 @@
 """
 风险等级分析模块
 
-根据静态检查和AI结果
-判断代码风险等级
+根据AI分析结果和静态检查结果
+综合判断代码风险
 """
+
+
+import json
+
+
+
+def get_risk_description(risk):
+    """
+    根据风险等级生成描述
+    """
+
+
+    if risk == "High":
+
+        return "发现严重代码问题，建议修改后再提交。"
+
+
+
+    elif risk == "Medium":
+
+        return "存在潜在风险，建议人工复查。"
+
+
+
+    else:
+
+        return "未发现明显风险，可以继续提交。"
 
 
 def analyze_risk(static_result, ai_result):
     """
-    分析代码风险
-
-    返回:
-    High
-    Medium
-    Low
+    综合分析风险等级
     """
 
-    # 默认低风险
+
+
+    # 默认风险
 
     risk = "Low"
 
 
 
-    # 转小写方便判断
-
-    text = (
-        static_result
-        +
-        ai_result
-    ).lower()
+    # =========================
+    # 第一优先级：分析AI结果
+    # =========================
 
 
+    try:
 
-    # 高风险关键词
-
-    high_keywords = [
-
-        "sql injection",
-
-        "sql注入",
-
-        "nullpointer",
-
-        "空指针",
-
-        "undefined variable"
-
-    ]
+        data = json.loads(ai_result)
 
 
+        issues = data.get(
+            "issues",
+            []
+        )
 
-    # 中风险关键词
 
-    medium_keywords = [
+        for issue in issues:
 
-        "warning",
 
-        "missing",
+            level = issue.get(
+                "level",
+                ""
+            )
 
-        "docstring"
 
-    ]
+            level = level.lower()
 
 
 
-    # 判断高风险
+            if (
+                "high" in level
+                or
+                "严重" in level
+                or
+                "critical" in level
+                or
+                "error" in level
+            ):
 
-    for word in high_keywords:
-
-        if word in text:
-
-            risk = "High"
-
-            break
+                return "High"
 
 
 
-    # 如果不是高风险，再判断中风险
-
-    if risk == "Low":
-
-        for word in medium_keywords:
-
-            if word in text:
+            elif (
+                "medium" in level
+                or
+                "warning" in level
+                or
+                "中" in level
+            ):
 
                 risk = "Medium"
 
-                break
+
+
+    except Exception:
+
+        pass
+
+
+
+    # =========================
+    # 第二优先级：静态检查兜底
+    # =========================
+
+
+    text = static_result.lower()
+
+
+
+    if (
+        "error"
+        in text
+    ):
+
+        return "High"
+
+
+
+    if (
+        "warning"
+        in text
+    ):
+
+        risk = "Medium"
 
 
 

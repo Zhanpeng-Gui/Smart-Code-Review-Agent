@@ -8,7 +8,24 @@
 
 import json
 
+def convert_level(level):
+    """
+    将AI输出等级转换为中文等级
+    """
 
+    level = level.lower()
+
+
+    if level in ["error", "high", "critical"]:
+        return "严重"
+
+
+    elif level in ["warning", "medium"]:
+        return "警告"
+
+
+    else:
+        return "提示"
 
 def format_ai_result(ai_result):
     """
@@ -51,7 +68,7 @@ def format_ai_result(ai_result):
 
         markdown += (
             f"|{issue.get('type')}|"
-            f"{issue.get('level')}|"
+            f"{convert_level(issue.get('level'))}|"
             f"{issue.get('location')}|"
             f"{issue.get('reason')}|"
             f"{issue.get('suggestion')}|\n"
