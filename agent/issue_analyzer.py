@@ -6,7 +6,7 @@
 """
 
 
-import json
+from utils.json_parser import parse_llm_json
 
 
 
@@ -30,7 +30,7 @@ def analyze_issues(ai_result):
 
     try:
 
-        data = json.loads(ai_result)
+        data = parse_llm_json(ai_result)
 
 
         issues = data.get(

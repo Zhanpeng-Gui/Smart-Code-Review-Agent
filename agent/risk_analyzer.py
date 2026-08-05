@@ -6,7 +6,7 @@
 """
 
 
-import json
+from utils.json_parser import parse_llm_json
 
 
 
@@ -53,7 +53,18 @@ def analyze_risk(static_result, ai_result):
 
     try:
 
-        data = json.loads(ai_result)
+        # 去除模型可能返回的markdown代码块
+
+        ai_result = ai_result.replace(
+            "```json",
+            ""
+        ).replace(
+            "```",
+            ""
+        ).strip()
+
+
+        data = parse_llm_json(ai_result)
 
 
         issues = data.get(
@@ -95,6 +106,8 @@ def analyze_risk(static_result, ai_result):
                 "warning" in level
                 or
                 "中" in level
+                or
+                "warn" in level
             ):
 
                 risk = "Medium"

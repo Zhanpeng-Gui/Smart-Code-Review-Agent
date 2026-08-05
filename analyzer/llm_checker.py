@@ -41,11 +41,16 @@ def check_by_llm(code, static_result):
 请结合静态检查结果进行分析。
 
 检查：
-1.SQL注入
-2.空指针
-3.资源泄露
+
+1.SQL注入风险
+2.空指针风险
+3.资源泄露风险
 4.事务问题
-5.设计问题
+5.代码设计问题
+
+注意：
+不要重复报告静态检查已经发现的问题。
+重点分析静态工具无法发现的潜在风险。
 
 请严格按照JSON格式输出：
 
@@ -63,18 +68,39 @@ def check_by_llm(code, static_result):
 """
 
 
-    response = client.chat.completions.create(
+    try:
 
-        model="qwen-turbo",
+        response = client.chat.completions.create(
 
-        messages=[
+            model="qwen-turbo",
+
+            messages=[
+                {
+                    "role":"user",
+                    "content":prompt
+                }
+            ]
+
+        )
+
+
+        return response.choices[0].message.content
+
+
+
+    except Exception as e:
+
+
+        return """
+    {
+        "issues":[
             {
-                "role":"user",
-                "content":prompt
+                "type":"LLM Error",
+                "level":"warning",
+                "location":"AI service",
+                "reason":"模型调用失败",
+                "suggestion":"请检查网络连接或者API配置"
             }
         ]
-
-    )
-
-
-    return response.choices[0].message.content
+    }
+    """
