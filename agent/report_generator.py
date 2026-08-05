@@ -46,6 +46,8 @@ def generate_report(result):
 
     ai_result = result["ai_review"]
 
+    # 获取修复建议
+    fix_result = result["fix"]
 
     # 格式化AI结果
     ai_result = format_ai_result(
@@ -90,6 +92,11 @@ def generate_report(result):
 ## 五、静态检查结果
 
 {static_result}
+
+
+## 六、修复建议
+
+{fix_result}
 
 
 """

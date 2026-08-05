@@ -1,7 +1,9 @@
 """
 JSON解析工具
 
-处理LLM返回的Markdown代码块
+作用：
+解析大模型返回的JSON
+处理Markdown代码块
 """
 
 
@@ -11,51 +13,52 @@ import json
 
 def parse_llm_json(text):
     """
-    解析LLM返回JSON
+    解析LLM返回结果
 
     支持：
 
-    1. 原始JSON
+    1. 普通JSON
 
-    2. ```json
-       {}
-       ```
+    2. ```json代码块
+
     """
 
 
     try:
 
-        # 去除空格
+
+        # 去除markdown代码块
+
+
+        text = text.replace(
+            "```json",
+            ""
+        )
+
+
+        text = text.replace(
+            "```",
+            ""
+        )
+
 
         text = text.strip()
 
 
-        # 如果有markdown代码块
 
-        if text.startswith("```"):
-
-
-            text = text.replace(
-                "```json",
-                ""
-            )
-
-
-            text = text.replace(
-                "```",
-                ""
-            )
-
-
-            text = text.strip()
+        return json.loads(
+            text
+        )
 
 
 
-        return json.loads(text)
+    except Exception as e:
 
 
-
-    except Exception:
+        print(
+            "JSON解析失败:",
+            e
+        )
 
 
         return {}

@@ -20,13 +20,19 @@ from analyzer.checkstyle_checker import check_java_code
 # 导入大模型分析模块
 from analyzer.llm_checker import check_by_llm
 
+
 # 导入风险分析模块
 from agent.risk_analyzer import (
     analyze_risk,
     get_risk_description
 )
 
+# 导入问题分析模块
 from agent.issue_analyzer import analyze_issues
+
+# 导入修复建议生成模块
+from agent.fix_generator import generate_fix
+
 
 class CodeReviewAgent:
     """
@@ -174,6 +180,11 @@ class CodeReviewAgent:
             f"代码风险等级：{risk}"
         )
 
+        fix_result = generate_fix(
+            code,
+            ai_result
+        )
+        
         return {
 
             "language": language,
@@ -186,6 +197,7 @@ class CodeReviewAgent:
 
             "static_check": static_result,
 
-            "ai_review": ai_result
+            "ai_review": ai_result,
 
+            "fix": fix_result
         }  

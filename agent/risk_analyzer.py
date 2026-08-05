@@ -34,37 +34,17 @@ def get_risk_description(risk):
 
 
 def analyze_risk(static_result, ai_result):
-    """
-    综合分析风险等级
-    """
 
-
-
-    # 默认风险
 
     risk = "Low"
 
 
-
-    # =========================
-    # 第一优先级：分析AI结果
-    # =========================
-
-
     try:
 
-        # 去除模型可能返回的markdown代码块
 
-        ai_result = ai_result.replace(
-            "```json",
-            ""
-        ).replace(
-            "```",
-            ""
-        ).strip()
-
-
-        data = parse_llm_json(ai_result)
+        data = parse_llm_json(
+            ai_result
+        )
 
 
         issues = data.get(
@@ -79,71 +59,36 @@ def analyze_risk(static_result, ai_result):
             level = issue.get(
                 "level",
                 ""
-            )
-
-
-            level = level.lower()
+            ).lower()
 
 
 
-            if (
-                "high" in level
-                or
-                "严重" in level
-                or
-                "critical" in level
-                or
-                "error" in level
-            ):
+            if level in [
+                "critical",
+                "error",
+                "high"
+            ]:
 
                 return "High"
 
 
 
-            elif (
-                "medium" in level
-                or
-                "warning" in level
-                or
-                "中" in level
-                or
-                "warn" in level
-            ):
+            elif level in [
+                "warning",
+                "medium",
+                "warn"
+            ]:
 
                 risk = "Medium"
 
 
 
-    except Exception:
+    except Exception as e:
 
-        pass
-
-
-
-    # =========================
-    # 第二优先级：静态检查兜底
-    # =========================
-
-
-    text = static_result.lower()
-
-
-
-    if (
-        "error"
-        in text
-    ):
-
-        return "High"
-
-
-
-    if (
-        "warning"
-        in text
-    ):
-
-        risk = "Medium"
+        print(
+            "风险分析失败:",
+            e
+        )
 
 
 

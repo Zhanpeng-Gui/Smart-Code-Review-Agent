@@ -6,45 +6,51 @@
 """
 
 
-import json
+from utils.json_parser import parse_llm_json
+
+
 
 def convert_level(level):
     """
-    将AI输出等级转换为中文等级
+    AI等级转中文
     """
 
     level = level.lower()
 
 
-    if level in ["error", "high", "critical"]:
+    if level in [
+        "error",
+        "high",
+        "critical"
+    ]:
         return "严重"
 
 
-    elif level in ["warning", "medium"]:
+
+    elif level in [
+        "warning",
+        "medium",
+    ]:
         return "警告"
+
 
 
     else:
         return "提示"
 
+
+
+
+
 def format_ai_result(ai_result):
     """
-    将AI JSON结果转换成Markdown表格
+    JSON转Markdown
     """
 
 
-    try:
-
-        # 字符串转JSON
-
-        data = json.loads(ai_result)
-
-
-    except Exception:
-
-
-        return ai_result
-
+    data = parse_llm_json(
+        ai_result
+    )
 
 
     issues = data.get(
@@ -59,8 +65,10 @@ def format_ai_result(ai_result):
 
 
 
-    markdown = """|类型|等级|位置|原因|修改建议|\n|-|-|-|-|-|\n"""
-
+    markdown = """
+|类型|等级|位置|原因|修改建议|
+|-|-|-|-|-|
+"""
 
 
     for issue in issues:
@@ -68,12 +76,11 @@ def format_ai_result(ai_result):
 
         markdown += (
             f"|{issue.get('type')}|"
-            f"{convert_level(issue.get('level'))}|"
-            f"{issue.get('location')}|"
-            f"{issue.get('reason')}|"
-            f"{issue.get('suggestion')}|\n"
+            f"{convert_level(issue.get('level',''))}|"
+            f"{issue.get('location','')}|"
+            f"{issue.get('reason','')}|"
+            f"{issue.get('suggestion','')}|\n"
         )
-
 
 
 
