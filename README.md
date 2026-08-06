@@ -228,7 +228,8 @@ Smart-Code-Review-Agent
 │   └── llm_checker.py
 │
 ├── utils
-│   └── json_parser.py
+│   ├── json_parser.py
+│   └── logger.py
 │
 ├── api
 │   └── server.py
@@ -238,6 +239,10 @@ Smart-Code-Review-Agent
 │
 ├── rules
 │   └── checkstyle.xml
+│
+├── config
+│   ├── __init__.py
+│   └── settings.py
 │
 ├── main.py
 ├── requirements.txt
@@ -409,6 +414,12 @@ http://127.0.0.1:8000/docs
 - Markdown报告生成
 - 修复建议生成
 
+### Day8
+- 引入 FastAPI 后端服务
+- 提供 HTTP API 接口
+- 支持 Swagger 在线接口测试
+- 增加请求参数校验
+- 实现空代码输入拦截
 
 ## 七、未来优化方向
 
