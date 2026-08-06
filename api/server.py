@@ -12,6 +12,12 @@ from fastapi import FastAPI
 from agent.code_review_agent import CodeReviewAgent
 
 
+from pydantic import BaseModel
+
+class ReviewRequest(BaseModel):
+    code: str
+    language: str = "python"
+
 
 # 创建FastAPI应用
 
@@ -40,17 +46,30 @@ def home():
 
 
 @app.post("/review")
-def review_code(code: str):
-
-    """
-    接收代码
-    返回审查结果
-    """
+def review_code(request: ReviewRequest):
 
 
-    result = agent.review(
-        code
-    )
+    try:
+
+        # 输入校验
+        if not request.code.strip():
+
+            return {
+                "error": "代码不能为空"
+            }
 
 
-    return result
+        result = agent.review(
+            request.code
+        )
+
+
+        return result
+
+
+    except Exception as e:
+
+        return {
+            "error": "代码审查失败",
+            "detail": str(e)
+        }
