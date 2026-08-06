@@ -1,20 +1,19 @@
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
+from config.settings import (
+    DASHSCOPE_API_KEY,
+    LLM_MODEL,
+    LLM_BASE_URL
+)
 
-
-# 加载.env文件
-load_dotenv()
 
 
 # 从环境变量读取key
 client = OpenAI(
-    api_key=os.getenv(
-        "DASHSCOPE_API_KEY"
-    ),
 
-    base_url=
-    "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    api_key=DASHSCOPE_API_KEY,
+
+    base_url=LLM_BASE_URL
+
 )
 
 
@@ -113,7 +112,7 @@ info:
 
         response = client.chat.completions.create(
 
-            model="qwen-turbo",
+            model=LLM_MODEL,
 
             messages=[
                 {

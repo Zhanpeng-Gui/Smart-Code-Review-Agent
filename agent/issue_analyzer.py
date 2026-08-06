@@ -7,7 +7,7 @@
 
 
 from utils.json_parser import parse_llm_json
-
+from utils.logger import logger
 
 
 def analyze_issues(ai_result):
@@ -154,9 +154,8 @@ def analyze_issues(ai_result):
     except Exception as e:
 
 
-        print(
-            "问题统计失败:",
-            e
+        logger.error(
+            f"问题统计失败: {e}"
         )
 
 

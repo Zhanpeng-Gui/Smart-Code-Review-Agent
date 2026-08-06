@@ -30,8 +30,13 @@ from agent.risk_analyzer import (
 # 导入问题分析模块
 from agent.issue_analyzer import analyze_issues
 
+
 # 导入修复建议生成模块
 from agent.fix_generator import generate_fix
+
+
+# 导入日志模块
+from utils.logger import logger
 
 
 class CodeReviewAgent:
@@ -55,7 +60,9 @@ class CodeReviewAgent:
         - 参数配置
         """
 
-        print("Code Review Agent 初始化完成")
+        logger.info(
+            "Code Review Agent 初始化完成"
+        )
 
 
     def detect_language(self, code):
@@ -118,7 +125,7 @@ class CodeReviewAgent:
         language = self.detect_language(code)
 
 
-        print(
+        logger.info(
             f"检测到代码语言：{language}"
         )
 
@@ -147,8 +154,8 @@ class CodeReviewAgent:
 
         else:
 
-            static_result = (
-                "无法识别代码语言"
+            logger.info(
+                f"无法识别语言，静态检查跳过"
             )
 
 
@@ -176,7 +183,7 @@ class CodeReviewAgent:
             ai_result
         )
 
-        print(
+        logger.info(
             f"代码风险等级：{risk}"
         )
 

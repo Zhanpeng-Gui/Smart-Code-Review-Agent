@@ -8,7 +8,7 @@ JSON解析工具
 
 
 import json
-
+from utils.logger import logger
 
 
 def parse_llm_json(text):
@@ -55,9 +55,8 @@ def parse_llm_json(text):
     except Exception as e:
 
 
-        print(
-            "JSON解析失败:",
-            e
+        logger.error(
+            f"JSON解析失败:{e}"
         )
 
 
