@@ -1,4 +1,19 @@
-venv/
+# Python cache
 __pycache__/
-.vscode/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Environment variables
 .env
+
+# VS Code
+.vscode/
+
+# Temporary files
+temp_code.py
+Temp.java
+
+# Reports
+review_report.md
