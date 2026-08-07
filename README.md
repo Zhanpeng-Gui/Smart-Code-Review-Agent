@@ -451,3 +451,29 @@ http://127.0.0.1:8000/docs
 - 理解 Agent 工作流程
 - 学习 Prompt Engineering
 - 完成 AI 应用工程开发流程
+
+
+## API接口
+
+启动：
+
+uvicorn api.server:app --reload
+
+
+访问：
+
+http://127.0.0.1:8000/docs
+
+
+接口：
+
+POST /review
+
+
+功能：
+
+- Python代码审查
+- Java代码审查
+- pylint/checkstyle静态分析
+- LLM智能分析
+- 自动生成修复建议

@@ -6,7 +6,7 @@ FastAPI接口服务
 """
 
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 
 from agent.code_review_agent import CodeReviewAgent
@@ -14,10 +14,29 @@ from agent.code_review_agent import CodeReviewAgent
 
 from pydantic import BaseModel
 
-class ReviewRequest(BaseModel):
-    code: str
-    language: str = "python"
 
+from typing import Any
+
+
+class APIResponse(BaseModel):
+
+    success: bool
+
+    message: str
+
+    data: Any = None
+
+class ReviewRequest(BaseModel):
+
+    code: str
+    """
+    待审查的源代码
+    """
+
+    language: str = "python"
+    """
+    编程语言
+    """
 
 # 创建FastAPI应用
 
@@ -45,18 +64,35 @@ def home():
 
 
 
-@app.post("/review")
+@app.post(
+    "/review",
+    summary="智能代码审查接口",
+    description="""
+    输入源代码，
+    自动完成：
+
+    1. 代码语言检测
+    2. 静态代码检查
+    3. AI智能分析
+    4. 风险等级评估
+    5. 自动生成修复建议
+
+    支持：
+    - Python
+    - Java
+    """
+)
 def review_code(request: ReviewRequest):
 
 
     try:
 
-        # 输入校验
         if not request.code.strip():
 
-            return {
-                "error": "代码不能为空"
-            }
+            raise HTTPException(
+                status_code=400,
+                detail="代码不能为空"
+            )
 
 
         result = agent.review(
@@ -64,12 +100,22 @@ def review_code(request: ReviewRequest):
         )
 
 
-        return result
+        return APIResponse(
+            success=True,
+            message="代码审查完成",
+            data=result
+        )
+
+
+    except HTTPException:
+
+        raise
 
 
     except Exception as e:
 
         return {
-            "error": "代码审查失败",
-            "detail": str(e)
+            "success": False,
+            "message": f"代码审查失败: {str(e)}",
+            "data": None
         }
