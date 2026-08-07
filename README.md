@@ -552,7 +552,37 @@ http://127.0.0.1:8000/docs
 - Python / Java工具链调度
 - Agent执行流程优化
 
+- 引入 Planner-Executor 架构
+- 实现任务规划模块 Planner
+- 根据代码语言自动生成执行计划
+- 引入 Tool Registry 工具注册机制
+- 将静态检查和 LLM 分析封装为独立 Tool
+- 实现 Agent 动态调用不同工具完成代码审查流程
 
+
+当前 Agent 执行流程：
+
+用户代码
+
+↓
+
+CodeReviewAgent
+
+↓
+
+Planner生成任务计划
+
+↓
+
+Tool Registry选择工具
+
+↓
+
+执行代码分析
+
+↓
+
+风险评估与报告生成
 
 # 七、未来优化方向
 

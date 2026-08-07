@@ -1,53 +1,72 @@
 """
-Agent任务规划器
+Agent任务规划模块
 
-负责：
-1. 分析输入任务
-2. 制定执行计划
+根据代码类型决定调用哪些工具
 """
+
+
+from utils.logger import logger
+
 
 
 class Planner:
 
 
-    def create_plan(
-        self,
-        language
-    ):
-
-        """
-        根据语言生成执行计划
-        """
+    def create_plan(self, language):
 
 
-        plan = []
+        logger.info(
+            f"Planner开始规划任务: {language}"
+        )
+
+
+        plan = {
+
+
+            "language": language,
+
+
+            "tools": []
+
+        }
+
 
 
         if language == "python":
 
-            plan.append(
-                "python_checker"
-            )
+
+            plan["tools"] = [
+
+                "python_checker",
+
+                "llm_checker"
+
+            ]
+
 
 
         elif language == "java":
 
-            plan.append(
-                "java_checker"
-            )
+
+            plan["tools"] = [
+
+                "java_checker",
+
+                "llm_checker"
+
+            ]
+
 
 
         else:
 
-            return plan
 
+            plan["tools"] = [
 
+                "llm_checker"
 
-        # 所有语言都需要AI分析
+            ]
 
-        plan.append(
-            "llm_checker"
-        )
 
 
         return plan

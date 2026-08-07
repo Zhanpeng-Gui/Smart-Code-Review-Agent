@@ -141,16 +141,20 @@ class CodeReviewAgent:
         )
 
 
+        static_result = ""
+        ai_result = ""
+
+        tools_plan = plan["tools"]
+
+
+
         logger.info(
-            f"执行计划: {plan}"
+            f"执行计划: {tools_plan}"
         )
 
 
-        static_result = ""
 
-
-        for step in plan:
-
+        for step in tools_plan:
 
             tool = self.tools.get(
                 step
@@ -159,7 +163,7 @@ class CodeReviewAgent:
 
             if step == "llm_checker":
 
-                ai_result = tool(
+                ai_result = tool.run(
                     code,
                     static_result
                 )
@@ -167,23 +171,10 @@ class CodeReviewAgent:
 
             else:
 
-                static_result = tool(
+                static_result = tool.run(
                     code
                 )
 
-
-
-        # 调用大模型分析
-
-        llm = self.tools.get(
-            "llm_checker"
-        )
-
-
-        ai_result = llm(
-            code,
-            static_result
-        )
 
 
         # 返回最终结果
