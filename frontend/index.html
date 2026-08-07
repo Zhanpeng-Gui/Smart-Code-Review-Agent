@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>
+Smart Code Review Agent
+</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+
+<body>
+
+
+<h1>
+Smart Code Review Agent
+</h1>
+
+
+<div class="container">
+
+
+<h2>
+上传代码文件
+</h2>
+
+
+<input 
+type="file"
+id="fileInput"
+>
+
+
+<button onclick="reviewCode()">
+开始审查
+</button>
+
+<button onclick="downloadReport()">
+下载报告
+</button>
+
+<h2>
+审查结果
+</h2>
+
+
+
+<div id="result">
+
+
+等待提交代码...
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script src="/static/app.js"></script>
+
+
+</body>
+
+
+</html>

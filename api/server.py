@@ -5,8 +5,15 @@ FastAPI接口服务
 提供代码审查API
 """
 
+import os
+
+from fastapi.responses import FileResponse
 
 from fastapi import FastAPI, HTTPException
+
+from fastapi.staticfiles import StaticFiles
+
+from fastapi.responses import FileResponse
 
 
 from agent.code_review_agent import CodeReviewAgent
@@ -17,6 +24,8 @@ from pydantic import BaseModel
 
 from typing import Any
 
+from agent.report_generator import generate_report
+
 
 class APIResponse(BaseModel):
 
@@ -25,6 +34,8 @@ class APIResponse(BaseModel):
     message: str
 
     data: Any = None
+
+
 
 class ReviewRequest(BaseModel):
 
@@ -38,10 +49,26 @@ class ReviewRequest(BaseModel):
     编程语言
     """
 
+
+
 # 创建FastAPI应用
 
 app = FastAPI(
     title="Smart Code Review Agent"
+)
+
+
+
+# ==========================
+# 静态网页目录
+# ==========================
+
+app.mount(
+    "/static",
+    StaticFiles(
+        directory="frontend"
+    ),
+    name="static"
 )
 
 
@@ -52,17 +79,42 @@ agent = CodeReviewAgent()
 
 
 
+# ==========================
+# 首页
+# ==========================
+
 @app.get("/")
 def home():
 
-    return {
+    return FileResponse(
+        "frontend/index.html"
+    )
 
-        "message":
-        "Smart Code Review Agent API"
+@app.get("/download/report")
+def download_report():
 
-    }
+    return FileResponse(
+        "review_report.md",
+        filename="review_report.md"
+    )
+
+@app.get(
+    "/download/report",
+    summary="下载代码审查报告"
+)
+def download_report():
+
+    file_path = "review_report.md"
 
 
+    return FileResponse(
+        path=file_path,
+        filename="code_review_report.md",
+        media_type="text/markdown"
+    )
+# ==========================
+# 代码审查接口
+# ==========================
 
 @app.post(
     "/review",
@@ -87,6 +139,7 @@ def review_code(request: ReviewRequest):
 
     try:
 
+
         if not request.code.strip():
 
             raise HTTPException(
@@ -95,16 +148,26 @@ def review_code(request: ReviewRequest):
             )
 
 
+
         result = agent.review(
             request.code
         )
 
 
-        return APIResponse(
-            success=True,
-            message="代码审查完成",
-            data=result
+        generate_report(
+            result
         )
+
+        return APIResponse(
+
+            success=True,
+
+            message="代码审查完成",
+
+            data=result
+
+        )
+
 
 
     except HTTPException:
@@ -112,10 +175,17 @@ def review_code(request: ReviewRequest):
         raise
 
 
+
     except Exception as e:
 
+
         return {
+
             "success": False,
-            "message": f"代码审查失败: {str(e)}",
+
+            "message":
+            f"代码审查失败: {str(e)}",
+
             "data": None
+
         }
