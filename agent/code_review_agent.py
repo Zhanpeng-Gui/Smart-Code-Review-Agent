@@ -8,17 +8,10 @@
 4. 返回检查结果
 """
 
-
-# 导入Python静态检查模块
-from analyzer.pylint_checker import check_python_code
+from agent.planner import Planner
 
 
-# 导入Java静态检查模块
-from analyzer.checkstyle_checker import check_java_code
-
-
-# 导入大模型分析模块
-from analyzer.llm_checker import check_by_llm
+from tools.tool_manager import create_tool_registry
 
 
 # 导入风险分析模块
@@ -59,6 +52,11 @@ class CodeReviewAgent:
         - 工具列表
         - 参数配置
         """
+
+        self.tools = create_tool_registry()
+
+        self.planner = Planner()
+
 
         logger.info(
             "Code Review Agent 初始化完成"
@@ -138,31 +136,51 @@ class CodeReviewAgent:
 
         # Python代码
 
-        if language == "python":
-
-            static_result = check_python_code(code)
-
-
-
-        # Java代码
-
-        elif language == "java":
-
-            static_result = check_java_code(code)
+        plan = self.planner.create_plan(
+            language
+        )
 
 
+        logger.info(
+            f"执行计划: {plan}"
+        )
 
-        else:
 
-            logger.info(
-                f"无法识别语言，静态检查跳过"
+        static_result = ""
+
+
+        for step in plan:
+
+
+            tool = self.tools.get(
+                step
             )
+
+
+            if step == "llm_checker":
+
+                ai_result = tool(
+                    code,
+                    static_result
+                )
+
+
+            else:
+
+                static_result = tool(
+                    code
+                )
 
 
 
         # 调用大模型分析
 
-        ai_result = check_by_llm(
+        llm = self.tools.get(
+            "llm_checker"
+        )
+
+
+        ai_result = llm(
             code,
             static_result
         )
