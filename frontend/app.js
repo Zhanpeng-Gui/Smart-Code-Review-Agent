@@ -1,5 +1,13 @@
 async function reviewCode(){
 
+    document.getElementById(
+        "result"
+    ).innerHTML =
+    `
+    <h3>
+    ⏳ 正在分析代码，请稍候...
+    </h3>
+    `;
 
     let file =
     document.getElementById(
@@ -23,6 +31,31 @@ async function reviewCode(){
     let code =
     await file.text();
 
+    document.getElementById(
+        "fileInfo"
+    ).innerHTML =
+`
+<h3>
+文件信息
+</h3>
+
+<p>
+文件名:
+${file.name}
+</p>
+
+<p>
+代码长度:
+${code.length}
+字符
+</p>
+
+<p>
+语言:
+${file.name.endsWith(".java") ? "Java" : "Python"}
+</p>
+
+`;
 
 
     let response =
@@ -84,76 +117,202 @@ async function reviewCode(){
     let data =
     result.data;
 
+let issuesHTML = "";
+
+try {
+
+
+    let ai =
+    JSON.parse(
+        data.ai_review
+    );
+
+
+    if(ai.issues.length > 0){
+
+
+        issuesHTML = `
+
+<table border="1" cellpadding="8">
+
+<tr>
+
+<th>
+类型
+</th>
+
+<th>
+等级
+</th>
+
+<th>
+位置
+</th>
+
+<th>
+原因
+</th>
+
+</tr>
+
+${
+ai.issues.map(
+issue =>
+
+`
+
+<tr>
+
+<td>
+${issue.type}
+</td>
+
+
+<td>
+${issue.level}
+</td>
+
+
+<td>
+${issue.location}
+</td>
+
+
+<td>
+${issue.reason}
+</td>
+
+
+</tr>
+
+`
+
+).join("")
+
+}
+
+</table>
+
+`;
+
+    }
+
+
+    else{
+
+
+        issuesHTML =
+        "<p>未发现代码问题</p>";
+
+
+    }
+
+
+}
+catch(e){
+
+    issuesHTML =
+    "<p>问题解析失败</p>";
+
+}
+
+let riskColor="";
+
+
+if(data.risk==="High"){
+
+    riskColor="red";
+
+}
+else if(data.risk==="Medium"){
+
+    riskColor="orange";
+
+}
+else{
+
+    riskColor="green";
+
+}
 
 
     document.getElementById(
     "result"
     ).innerHTML = `
 
-
 <h2>
 审查结果
 </h2>
 
 
-<h3>
-代码语言
-</h3>
-
-<p>
-${data.language}
-</p>
+<div class="risk-card"
+style="border-left:8px solid ${riskColor};">
 
 
 <h3>
 风险等级
 </h3>
 
-<p>
+
+<h2>
+${data.risk==="High" ? "🔴" :
+ data.risk==="Medium" ? "🟠" :
+ "🟢"}
+
 ${data.risk}
+
+</h2>
+
+
+<p>
+${data.risk_description}
 </p>
+
+
+</div>
+
 
 
 <h3>
 问题统计
 </h3>
 
-<ul>
 
-<li>
+<p>
 严重:
 ${data.issue_summary.high}
-</li>
+</p>
 
-<li>
+
+<p>
 中等:
 ${data.issue_summary.medium}
-</li>
+</p>
 
-<li>
-低:
+
+<p>
+低风险:
 ${data.issue_summary.low}
-</li>
+</p>
 
-</ul>
 
 
 <h3>
-AI分析
+问题列表
 </h3>
 
-<pre>
-${data.ai_review}
-</pre>
+${issuesHTML}
+
 
 
 <h3>
-静态检查
+静态检查结果
 </h3>
 
 <pre>
 ${data.static_check}
 </pre>
+
 
 
 <h3>
@@ -164,9 +323,7 @@ ${data.static_check}
 ${data.fix}
 </pre>
 
-
-`;
-
+`
 }
 
 
