@@ -1,11 +1,24 @@
 # Smart-Code-Review-Agent
 
-一个基于大语言模型（LLM）的智能代码审查 Agent。
 
-该项目模拟企业级 Code Review 流程，通过 **静态分析工具 + 大语言模型 + Agent 调度机制**，实现对 Python / Java 代码的自动化审查，并生成结构化审查结果和 Markdown 修复报告。
+一个基于 **LLM + Agent 架构** 的智能代码审查系统。
 
+
+该项目模拟企业级 Code Review 流程，通过：
+
+- 静态分析工具
+- 大语言模型
+- Agent任务规划
+- 工具调度机制
+- 历史记忆模块
+
+实现对 Python / Java 代码的自动化审查，并生成结构化审查结果和 Markdown 修复报告。
+
+
+---
 
 # 一、项目简介
+
 
 在传统软件开发流程中，代码 Review 通常依赖人工完成，存在：
 
@@ -13,51 +26,83 @@
 - 容易遗漏潜在风险
 - 重复性规范检查耗费时间
 
-本项目设计并实现一个智能代码审查 Agent：
+
+本项目设计并实现一个智能代码审查 Agent。
+
 
 用户提交代码后，Agent 自动完成：
 
+
 1. 代码语言识别
-2. Agent任务规划
-3. 工具选择与调用
-4. 静态代码分析
-5. LLM智能分析
-6. 风险等级评估
-7. 问题统计
-8. 自动生成修复建议
-9. 输出结构化审查报告
+2. 历史审查记录读取
+3. Agent任务规划
+4. 工具选择与调用
+5. 静态代码分析
+6. LLM智能分析
+7. 风险等级评估
+8. 问题统计
+9. 自动生成修复建议
+10. Markdown审查报告生成
 
 
 整体流程：
 
+
 ```
-              用户代码
-                  |
-                  v
-        Code Review Agent
-                  |
-          Tool Planner
-                  |
-        +---------+---------+
-        |                   |
-        v                   v
-  静态分析工具             LLM分析
-        |                   |
-        +---------+---------+
-                  |
-                  v
-          风险分析模块
-                  |
-                  v
-       Markdown Review Report
+                 用户代码
+                    |
+                    v
+
+          Code Review Agent
+
+                    |
+                    v
+
+              Memory模块
+          (历史审查记录)
+
+                    |
+                    v
+
+              Planner规划
+
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+
+   Static Tools             LLM Tool
+
+(pylint/checkstyle)       智能分析
+
+          |                   |
+
+          +---------+---------+
+
+                    |
+                    v
+
+             Risk Analyzer
+
+                    |
+                    v
+
+          Fix Generator
+
+                    |
+                    v
+
+          Markdown Report
 ```
 
 
+---
 
 # 二、项目功能
 
 
 ## 1. 多语言代码检测
+
 
 目前支持：
 
@@ -65,7 +110,8 @@
 - Java
 
 
-通过规则自动识别代码语言。
+通过代码特征自动识别语言。
+
 
 后续可扩展：
 
@@ -74,16 +120,29 @@
 - Go
 
 
+
 ---
 
 
-## 2. Agent工具调度机制
+## 2. Agent任务规划机制
 
-项目引入简单 Agent Planner。
 
-根据代码语言自动决定调用工具：
+项目引入 Planner 模块。
 
-Python:
+
+Planner 根据：
+
+- 当前代码语言
+- 历史审查记录
+
+
+自动决定需要调用的工具。
+
+
+例如：
+
+
+Python代码：
 
 ```
 python_checker
@@ -91,7 +150,7 @@ llm_checker
 ```
 
 
-Java:
+Java代码：
 
 ```
 java_checker
@@ -99,20 +158,72 @@ llm_checker
 ```
 
 
-示例：
-
-```python
-['python_checker', 'llm_checker']
-```
-
-Agent 不再固定执行所有工具，而是根据任务选择合适工具。
-
+Agent 不再固定执行所有流程，而是根据任务动态规划执行步骤。
 
 
 ---
 
 
-## 3. Python静态代码检查
+## 3. Tool Registry工具管理机制
+
+
+项目采用工具注册机制管理不同分析能力。
+
+
+当前支持：
+
+
+```
+python_checker
+
+java_checker
+
+llm_checker
+```
+
+
+每个工具独立封装：
+
+- 输入代码
+- 执行分析
+- 返回结果
+
+
+后续可以扩展：
+
+```
+security_checker
+
+performance_checker
+
+database_checker
+```
+
+
+---
+
+
+## 4. Memory历史记忆模块
+
+
+Agent支持历史审查记录保存。
+
+
+记录内容包括：
+
+- 审查时间
+- 风险等级
+- 问题统计
+- 主要问题
+
+
+历史信息会传递给 Planner，辅助后续任务规划。
+
+
+---
+
+
+## 5. Python静态代码检查
 
 
 使用：
@@ -123,23 +234,23 @@ Agent 不再固定执行所有工具，而是根据任务选择合适工具。
 检测：
 
 - 未定义变量
+- 语法错误
 - 缩进错误
-- 缺少文档字符串
 - 代码规范问题
 
 
 示例：
 
 ```
-temp_code.py:2:10: E0602: Undefined variable 'a'
+temp_code.py:2:10:
+E0602 Undefined variable 'a'
 ```
-
 
 
 ---
 
 
-## 4. Java代码静态检查
+## 6. Java代码静态检查
 
 
 使用：
@@ -154,11 +265,10 @@ temp_code.py:2:10: E0602: Undefined variable 'a'
 - 编码规范问题
 
 
-
 ---
 
 
-## 5. LLM智能代码分析
+## 7. LLM智能代码分析
 
 
 接入：
@@ -178,6 +288,7 @@ temp_code.py:2:10: E0602: Undefined variable 'a'
 
 输出结构化 JSON：
 
+
 ```json
 {
     "issues":[
@@ -193,11 +304,10 @@ temp_code.py:2:10: E0602: Undefined variable 'a'
 ```
 
 
-
 ---
 
 
-## 6. 风险等级评估
+## 8. 风险等级评估
 
 
 根据：
@@ -216,11 +326,10 @@ temp_code.py:2:10: E0602: Undefined variable 'a'
 |Low|未发现明显风险|
 
 
-
 ---
 
 
-## 7. 自动生成代码修复建议
+## 9. 自动生成代码修复建议
 
 
 针对发现的问题生成：
@@ -234,19 +343,17 @@ temp_code.py:2:10: E0602: Undefined variable 'a'
 
 ```python
 def test():
-    """
-    测试函数
-    """
+
     a = 10
+
     print(a)
 ```
-
 
 
 ---
 
 
-## 8. Markdown报告生成
+## 10. Markdown报告生成
 
 
 自动生成：
@@ -265,53 +372,33 @@ review_report.md
 - 修复建议
 
 
-
 ---
 
 
-## 9. FastAPI接口服务
+## 11. Web可视化界面
 
 
-提供 HTTP API：
+基于：
 
-接口：
-
-```
-POST /review
-```
+- HTML
+- CSS
+- JavaScript
 
 
-请求：
+实现：
 
-```json
-{
-    "code":"def test():\n    print(a)",
-    "language":"python"
-}
-```
-
-
-返回：
-
-```json
-{
-    "success":true,
-    "message":"代码审查完成",
-    "data":{
-        "language":"python",
-        "risk":"High"
-    }
-}
-```
+- 文件上传
+- 代码审查
+- 风险展示
+- 问题列表展示
+- Markdown格式修复建议渲染
+- 报告下载
 
 
-支持：
+用户无需调用API即可完成代码审查。
 
-- 请求参数校验
-- 空代码拦截
-- 异常处理
-- Swagger接口测试
 
+---
 
 
 # 三、项目架构
@@ -323,41 +410,48 @@ Smart-Code-Review-Agent
 │
 ├── agent
 │   ├── code_review_agent.py
+│   ├── planner.py
+│   ├── memory_manager.py
 │   ├── risk_analyzer.py
 │   ├── issue_analyzer.py
 │   ├── report_generator.py
 │   ├── report_formatter.py
 │   └── fix_generator.py
 │
-├── analyzer
-│   ├── pylint_checker.py
-│   ├── checkstyle_checker.py
+├── tools
+│   ├── tool_manager.py
+│   ├── python_checker.py
+│   ├── java_checker.py
 │   └── llm_checker.py
 │
 ├── api
 │   └── server.py
+│
+├── frontend
+│   ├── index.html
+│   ├── app.js
+│   └── style.css
 │
 ├── utils
 │   ├── json_parser.py
 │   └── logger.py
 │
 ├── config
-│   ├── __init__.py
-│   └── settings.py
-│
-├── tools
-│   └── checkstyle-13.9.0-all.jar
+│   ├── settings.py
+│   └── __init__.py
 │
 ├── rules
 │   └── checkstyle.xml
 │
-├── test_tools.py
-├── test_llm.py
-├── main.py
 ├── requirements.txt
+│
+├── main.py
+│
 └── README.md
 ```
 
+
+---
 
 
 # 四、技术栈
@@ -379,15 +473,24 @@ Smart-Code-Review-Agent
 
 ## Agent
 
-- Tool Planning
+- Planner任务规划
+- Tool Registry
+- Memory机制
 - Agent Workflow设计
-- 多工具协调调用
 
 
 ## 静态分析
 
 - pylint
 - Checkstyle
+
+
+## 前端
+
+- HTML
+- CSS
+- JavaScript
+- marked.js
 
 
 ## 工程工具
@@ -397,18 +500,14 @@ Smart-Code-Review-Agent
 - VSCode
 
 
+---
+
 
 # 五、运行方式
 
 
-## 1. 克隆项目
+## 1. 创建虚拟环境
 
-```bash
-git clone https://github.com/yourname/Smart-Code-Review-Agent.git
-```
-
-
-## 2. 创建虚拟环境
 
 ```bash
 python -m venv venv
@@ -417,14 +516,17 @@ python -m venv venv
 
 启动：
 
-Windows:
+Windows：
 
 ```bash
 venv\Scripts\activate
 ```
 
 
-## 3. 安装依赖
+---
+
+
+## 2. 安装依赖
 
 
 ```bash
@@ -432,8 +534,10 @@ pip install -r requirements.txt
 ```
 
 
+---
 
-## 4. 配置API Key
+
+## 3. 配置API Key
 
 
 创建：
@@ -450,8 +554,10 @@ DASHSCOPE_API_KEY=your_api_key
 ```
 
 
+---
 
-## 5. 启动服务
+
+## 4. 启动服务
 
 
 ```bash
@@ -462,12 +568,18 @@ uvicorn api.server:app --reload
 访问：
 
 ```
+http://127.0.0.1:8000
+```
+
+
+Swagger：
+
+```
 http://127.0.0.1:8000/docs
 ```
 
 
-进入 FastAPI Swagger 页面测试接口。
-
+---
 
 
 # 六、项目开发过程
@@ -511,7 +623,7 @@ http://127.0.0.1:8000/docs
 完成：
 
 - AI结果解析
-- JSON处理
+- JSON结构化处理
 
 
 ## Day6
@@ -519,7 +631,7 @@ http://127.0.0.1:8000/docs
 完成：
 
 - 风险等级分析
-- 问题统计
+- 问题统计模块
 
 
 ## Day7
@@ -538,32 +650,33 @@ http://127.0.0.1:8000/docs
 - HTTP API接口
 - Swagger接口测试
 - 请求参数校验
-- 空代码输入拦截
-- API统一响应格式
+- 异常处理
 
 
 ## Day9
 
 完成：
 
-- Agent工具规划模块
+- Agent Planner模块
 - Tool Registry设计
-- 根据代码类型动态选择工具
-- Python / Java工具链调度
-- Agent执行流程优化
-
-- 引入 Planner-Executor 架构
-- 实现任务规划模块 Planner
-- 根据代码语言自动生成执行计划
-- 引入 Tool Registry 工具注册机制
-- 将静态检查和 LLM 分析封装为独立 Tool
-- 实现 Agent 动态调用不同工具完成代码审查流程
-
-- Agent工具注册机制
-- Planner任务规划
 - 动态工具调用
-- Web前端界面
+- Agent执行流程优化
+- Web前端页面
 - 文件上传代码审查
+
+
+## Day10
+
+完成：
+
+- 前端UI优化
+- Markdown网页渲染
+- Agent Memory模块
+- Planner结合历史记录
+- Agent Workflow完善
+
+
+---
 
 
 # 七、未来优化方向
@@ -571,14 +684,16 @@ http://127.0.0.1:8000/docs
 
 后续计划：
 
-- 增加 Web 前端页面
-- 支持代码文件上传
+- 多Agent协作
+- 自动修复代码并生成Patch
 - GitHub Pull Request自动Review
+- RAG代码知识库
+- 支持代码仓库级分析
+- 增加安全漏洞扫描
 - 支持更多编程语言
-- 引入RAG增强代码理解
-- 接入代码仓库级分析
-- 增加用户权限管理
 
+
+---
 
 
 # 八、项目总结
@@ -586,11 +701,13 @@ http://127.0.0.1:8000/docs
 
 本项目实现了一个完整的智能代码审查 Agent。
 
+
 相比传统静态检查工具：
 
 - 静态工具负责发现确定性问题
 - LLM负责理解代码逻辑和业务风险
-- Agent负责规划任务并协调多个工具完成审查流程
+- Agent负责任务规划和工具协调
+- Memory负责保存历史上下文
 
 
 通过项目实践：
@@ -599,8 +716,11 @@ http://127.0.0.1:8000/docs
 - 理解Agent工作机制
 - 学习Prompt Engineering
 - 完成AI应用工程开发流程
-- 掌握FastAPI后端接口开发
+- 掌握FastAPI后端开发
+- 理解Agent系统设计
 
+
+---
 
 
 # API接口
@@ -610,13 +730,6 @@ http://127.0.0.1:8000/docs
 
 ```bash
 uvicorn api.server:app --reload
-```
-
-
-访问：
-
-```
-http://127.0.0.1:8000/docs
 ```
 
 
@@ -633,5 +746,7 @@ POST /review
 - Java代码审查
 - pylint/checkstyle静态分析
 - LLM智能分析
-- Agent工具调度
+- Agent任务规划
+- Memory历史记录
 - 自动生成修复建议
+- Markdown报告生成
