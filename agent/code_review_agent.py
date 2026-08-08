@@ -31,6 +31,8 @@ from agent.fix_generator import generate_fix
 # 导入日志模块
 from utils.logger import logger
 
+# 导入历史记录管理模块
+from agent.memory_manager import get_recent_reviews
 
 class CodeReviewAgent:
     """
@@ -134,10 +136,14 @@ class CodeReviewAgent:
 
 
 
-        # Python代码
+        # 第二步：获取历史记录
 
+        history = get_recent_reviews()
+
+        # 第三步：创建执行计划
         plan = self.planner.create_plan(
-            language
+            language,
+            history
         )
 
 

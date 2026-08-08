@@ -5,28 +5,32 @@ FastAPI接口服务
 提供代码审查API
 """
 
-import os
 
-from fastapi.responses import FileResponse
+from typing import Any
 
-from fastapi import FastAPI, HTTPException
+
+from fastapi import (
+    FastAPI,
+    HTTPException
+)
+
 
 from fastapi.staticfiles import StaticFiles
 
+
 from fastapi.responses import FileResponse
-
-
-from agent.code_review_agent import CodeReviewAgent
 
 
 from pydantic import BaseModel
 
 
-from typing import Any
+from agent.code_review_agent import CodeReviewAgent
+
 
 from agent.report_generator import generate_report
 
 
+from agent.memory_manager import save_review
 class APIResponse(BaseModel):
 
     success: bool
@@ -90,13 +94,6 @@ def home():
         "frontend/index.html"
     )
 
-@app.get("/download/report")
-def download_report():
-
-    return FileResponse(
-        "review_report.md",
-        filename="review_report.md"
-    )
 
 @app.get(
     "/download/report",
@@ -153,7 +150,8 @@ def review_code(request: ReviewRequest):
             request.code
         )
 
-
+        save_review(result)
+        
         generate_report(
             result
         )

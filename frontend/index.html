@@ -8,7 +8,9 @@
 Smart Code Review Agent
 </title>
 
-<link rel="stylesheet" href="/static/style.css">
+
+<link rel="stylesheet" href="/static/style.css?v=3">
+
 
 </head>
 
@@ -16,41 +18,142 @@ Smart Code Review Agent
 <body>
 
 
+<div class="page">
+
+
+<!-- 顶部介绍 -->
+
+<div class="header">
+
+
 <h1>
-Smart Code Review Agent
+🤖 Smart Code Review Agent
 </h1>
 
 
-<div class="container">
+<p>
+基于 LLM + Agent 架构的智能代码审查助手
+</p>
+
+
+</div>
+
+
+
+<!-- 上传区域 -->
+
+<div class="card upload-card">
 
 
 <h2>
-上传代码文件
+📂 上传代码
 </h2>
 
 
-<input 
+<p>
+支持 Python / Java 文件
+</p>
+
+
+
+<input
 type="file"
 id="fileInput"
 >
 
 
-<button onclick="reviewCode()">
-开始审查
-</button>
-
-<button onclick="downloadReport()">
-下载报告
-</button>
-
-<h2>
-审查结果
-</h2>
-
 
 <div id="fileInfo">
 
 </div>
+
+
+
+<div class="button-group">
+
+
+<button
+onclick="reviewCode()"
+class="primary-btn"
+>
+
+开始审查
+
+</button>
+
+
+
+<button
+onclick="downloadReport()"
+class="secondary-btn"
+>
+
+下载报告
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- Loading区域 -->
+
+
+<div
+id="loading"
+class="card loading"
+style="display:none;"
+>
+
+
+🤖 Agent正在分析代码...
+
+<br>
+
+<br>
+
+✓ 读取代码
+
+<br>
+
+✓ 静态检查
+
+<br>
+
+✓ LLM智能分析
+
+<br>
+
+⏳ 生成审查报告
+
+
+</div>
+
+
+
+
+
+
+
+<!-- 结果区域 -->
+
+
+<div
+class="card"
+>
+
+
+<h2>
+📊 审查结果
+</h2>
+
+
 
 <div id="result">
 
@@ -61,10 +164,17 @@ id="fileInput"
 </div>
 
 
+</div>
+
+
+
+
 
 </div>
 
 
+
+<script src="https://cdn.jsdelivr.net/npm/marked@11.2.0/marked.min.js"></script>
 
 <script src="/static/app.js"></script>
 

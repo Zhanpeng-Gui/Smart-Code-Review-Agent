@@ -1,0 +1,52 @@
+[
+    {
+        "time": "2026-08-08 16:46:58.406426",
+        "risk": "High",
+        "summary": {
+            "total": 1,
+            "high": 1,
+            "medium": 0,
+            "low": 0
+        }
+    },
+    {
+        "time": "2026-08-08 16:52:25.559906",
+        "risk": "High",
+        "summary": {
+            "total": 1,
+            "high": 1,
+            "medium": 0,
+            "low": 0
+        },
+        "issues": [
+            {
+                "type": "syntax-error",
+                "level": "critical",
+                "location": "temp_code.py:1:13",
+                "reason": "代码中存在无效的不可打印字符 U+000D（回车符），导致语法错误。",
+                "suggestion": "移除或替换该不可打印字符，确保代码中没有非法字符。"
+            }
+        ],
+        "fix": "1. **问题原因**  \n代码中存在一个不可打印字符 `U+000D`（回车符），这通常是在 Windows 系统中使用 `CRLF` 作为换行符时，误将回车符（`\\r`）插入到代码中。Python 解释器无法识别该字符，导致语法错误。\n\n2. **修改方案**  \n移除或替换代码中的不可打印字符（如 `\\r`），确保代码中只包含合法的 ASCII 或 Unicode 字符。可以通过文本编辑器（如 VS Code、Sublime Text 等）检查并删除这些非法字符，或者使用 Python 的字符串处理方法进行清理。\n\n3. **修复后的代码**  \n```python\ndef test():\n    print(a)\n```\n\n> 注意：如果问题仅是由于不可打印字符引起，且 `a` 在其他地方定义，此代码在去除非法字符后应能正常运行。若 `a` 未定义，还会引发 `NameError`，需根据实际需求补充 `a` 的定义。"
+    },
+    {
+        "time": "2026-08-08 17:05:38.357506",
+        "risk": "High",
+        "summary": {
+            "total": 1,
+            "high": 1,
+            "medium": 0,
+            "low": 0
+        },
+        "issues": [
+            {
+                "type": "syntax-error",
+                "level": "critical",
+                "location": "temp_code.py:1:13",
+                "reason": "代码中存在无效的不可打印字符 U+000D（回车符），导致语法错误，无法正常执行。",
+                "suggestion": "移除或替换该不可打印字符，确保代码中没有非法字符。可以使用文本编辑器检查并删除该字符。"
+            }
+        ],
+        "fix": "1. **问题原因**  \n   在代码中存在一个不可打印字符 `U+000D`（回车符），这会导致 Python 解释器在解析代码时出现语法错误。该字符通常出现在 Windows 系统中使用换行符 `\\r\\n` 的情况下，但在 Python 代码中仅使用 `\\n` 作为换行符。因此，该非法字符导致了 `SyntaxError`，使得代码无法正常执行。\n\n2. **修改方案**  \n   需要移除或替换掉该不可打印字符。可以使用文本编辑器（如 VS Code、Notepad++）打开文件，查找并删除该字符，或者使用 Python 脚本清理文件内容中的非法字符。\n\n3. **修复后的代码**  \n```python\ndef test():\n    print(username)\n```\n\n> 注意：除了移除非法字符外，还需确保 `username` 变量已被定义，否则会引发 `NameError`。如果 `username` 是从外部传入的参数，建议将其作为函数参数传递。例如：\n```python\ndef test(username):\n    print(username)\n```"
+    }
+]

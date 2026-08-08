@@ -12,61 +12,51 @@ from utils.logger import logger
 class Planner:
 
 
-    def create_plan(self, language):
+    def create_plan(
+        self,
+        language,
+        history=None
+    ):
 
 
-        logger.info(
-            f"Planner开始规划任务: {language}"
-        )
-
-
-        plan = {
-
-
-            "language": language,
-
-
-            "tools": []
-
-        }
+        print("Planner收到历史记录:")
+        print(history)
 
 
 
         if language == "python":
 
-
-            plan["tools"] = [
-
+            tools = [
                 "python_checker",
-
                 "llm_checker"
-
             ]
-
 
 
         elif language == "java":
 
-
-            plan["tools"] = [
-
+            tools = [
                 "java_checker",
-
                 "llm_checker"
-
             ]
-
 
 
         else:
 
-
-            plan["tools"] = [
-
+            tools = [
                 "llm_checker"
-
             ]
 
+
+
+        plan = {
+
+            "language": language,
+
+            "tools": tools,
+
+            "history": history
+
+        }
 
 
         return plan

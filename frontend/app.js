@@ -1,3 +1,28 @@
+function cleanMarkdown(text){
+
+
+    // 去除最外层 ```markdown 包裹
+
+    text = text.replace(
+        /^```markdown\s*/,
+        ""
+    );
+
+
+    text = text.replace(
+        /\s*```$/,
+        ""
+    );
+
+
+    return text;
+
+}
+
+
+
+
+
 async function reviewCode(){
 
     document.getElementById(
@@ -8,6 +33,7 @@ async function reviewCode(){
     ⏳ 正在分析代码，请稍候...
     </h3>
     `;
+
 
     let file =
     document.getElementById(
@@ -30,6 +56,8 @@ async function reviewCode(){
 
     let code =
     await file.text();
+
+
 
     document.getElementById(
         "fileInfo"
@@ -58,11 +86,11 @@ ${file.name.endsWith(".java") ? "Java" : "Python"}
 `;
 
 
+
     let response =
     await fetch(
         "/review",
         {
-
 
             method:"POST",
 
@@ -117,23 +145,27 @@ ${file.name.endsWith(".java") ? "Java" : "Python"}
     let data =
     result.data;
 
-let issuesHTML = "";
-
-try {
 
 
-    let ai =
-    JSON.parse(
-        data.ai_review
-    );
+    let issuesHTML = "";
 
 
-    if(ai.issues.length > 0){
+
+    try {
 
 
-        issuesHTML = `
+        let ai =
+        JSON.parse(
+            data.ai_review
+        );
 
-<table border="1" cellpadding="8">
+
+        if(ai.issues.length > 0){
+
+
+            issuesHTML = `
+
+<table class="issue-table">
 
 <tr>
 
@@ -154,6 +186,7 @@ try {
 </th>
 
 </tr>
+
 
 ${
 ai.issues.map(
@@ -191,62 +224,85 @@ ${issue.reason}
 
 }
 
+
 </table>
 
 `;
 
+        }
+
+
+        else{
+
+
+            issuesHTML =
+            "<p>未发现代码问题</p>";
+
+
+        }
+
+
     }
-
-
-    else{
+    catch(e){
 
 
         issuesHTML =
-        "<p>未发现代码问题</p>";
+        "<p>问题解析失败</p>";
 
 
     }
 
 
-}
-catch(e){
-
-    issuesHTML =
-    "<p>问题解析失败</p>";
-
-}
-
-let riskColor="";
 
 
-if(data.risk==="High"){
+    let riskColor="";
 
-    riskColor="red";
 
-}
-else if(data.risk==="Medium"){
 
-    riskColor="orange";
+    if(data.risk==="High"){
 
-}
-else{
+        riskColor="red";
 
-    riskColor="green";
+    }
+    else if(data.risk==="Medium"){
 
-}
+        riskColor="orange";
+
+    }
+    else{
+
+        riskColor="green";
+
+    }
+
+
+
+
+    // Markdown清洗
+
+    let markdownFix =
+    cleanMarkdown(
+        data.fix
+    );
+
+
+
 
 
     document.getElementById(
     "result"
     ).innerHTML = `
 
+
 <h2>
 审查结果
 </h2>
 
 
+
 <div class="risk-card"
 style="border-left:8px solid ${riskColor};">
+
 
 
 <h3>
@@ -255,13 +311,25 @@ style="border-left:8px solid ${riskColor};">
 
 
 <h2>
-${data.risk==="High" ? "🔴" :
- data.risk==="Medium" ? "🟠" :
- "🟢"}
+
+${
+data.risk==="High"
+?
+"🔴"
+:
+data.risk==="Medium"
+?
+"🟠"
+:
+"🟢"
+}
+
 
 ${data.risk}
 
+
 </h2>
+
 
 
 <p>
@@ -270,6 +338,7 @@ ${data.risk_description}
 
 
 </div>
+
 
 
 
@@ -284,10 +353,12 @@ ${data.issue_summary.high}
 </p>
 
 
+
 <p>
 中等:
 ${data.issue_summary.medium}
 </p>
+
 
 
 <p>
@@ -297,11 +368,15 @@ ${data.issue_summary.low}
 
 
 
+
 <h3>
 问题列表
 </h3>
 
+
 ${issuesHTML}
+
+
 
 
 
@@ -309,9 +384,14 @@ ${issuesHTML}
 静态检查结果
 </h3>
 
+
 <pre>
+
 ${data.static_check}
+
 </pre>
+
+
 
 
 
@@ -319,12 +399,19 @@ ${data.static_check}
 修复建议
 </h3>
 
-<pre>
-${data.fix}
-</pre>
 
-`
+<div class="markdown-body">
+
+${marked.parse(markdownFix)}
+
+</div>
+
+
+`;
+
 }
+
+
 
 
 
@@ -333,6 +420,6 @@ ${data.fix}
 function downloadReport(){
 
     window.location.href =
-    "/download/report"
+    "/download/report";
 
 }
